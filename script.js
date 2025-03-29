@@ -59,7 +59,7 @@ function Board() {
 
 
 function Cell() {
-
+    
     //Private
     let state = 0;
 
@@ -72,3 +72,33 @@ function Cell() {
 
     return { setState, getState };
 };
+
+
+function Game() {
+    const board = Board();
+    let players = ['x', 'o'];
+    let activePlayer = players[0];
+
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    }
+
+    const getActivePlayer = () => {
+        activePlayer;
+    }
+
+    const playRound = () => {
+        board.mark(activePlayer, 5)
+        board.mark(activePlayer, 4)
+        board.mark(activePlayer, 3)
+        switchPlayerTurn()
+        board.printBoard()
+        board.checkWinner()
+    }
+
+    playRound()
+
+
+}
+
+Game()
