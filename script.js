@@ -18,12 +18,15 @@ function Board() {
     function checkWinner(players) {
         if (hasWon(players[0])) {
             console.log(`${players[0]} wins!`);
+            return `${players[0]} wins!`;
         }
-        else if (players[1]) {
+        else if (hasWon(players[1])) {
             console.log(`${players[1]} wins!`);
+            return `${players[1]} wins!`;
         }
         else {
             console.log("NO winners!")
+            return "NO winners!";
         }
     }
 
@@ -81,6 +84,8 @@ function Cell() {
 
 function GameController() {
 
+    const result = document.querySelector('.result');
+
     const board = Board();
     let players = ['X', 'O'];
     let activePlayer = players[0];
@@ -96,10 +101,10 @@ function GameController() {
             `Dropping ${getActivePlayer()}'s token into cell ${loc}...`
         );
 
-        board.mark(activePlayer, loc)
-        console.log(board.printBoard())
-        board.checkWinner(players)
-        switchPlayerTurn()
+        board.mark(activePlayer, loc);
+        console.log(board.printBoard());
+        result.textContent = board.checkWinner(players); //Displaying result
+        switchPlayerTurn();
     }
 
 
@@ -118,6 +123,8 @@ function ScreenController() {
     const game = GameController()
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
+    const restartBtn = document.getElementById('restartBtn');
+    
 
     const updateScreen = () => {
 
@@ -155,6 +162,7 @@ function ScreenController() {
     }
 
     boardDiv.addEventListener("click", clickHandlerBoard);
+    restartBtn.addEventListener("click", () => location.reload());
     updateScreen()
 }
 
