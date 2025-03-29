@@ -6,16 +6,21 @@ function Board() {
 
 
     //Public:
+    const getBoard = () => board;
+
     const mark = (player, loc) => {
-        board[loc].setState(player);
+        if (board[loc].getState() === '_') {
+            board[loc].setState(player);
+        }
+
     };
 
-    function checkWinner() {
-        if (hasWon('x')) {
-            console.log("x win!");
+    function checkWinner(players) {
+        if (hasWon(players[0])) {
+            console.log(`${players[0]} wins!`);
         }
-        else if (hasWon('o')) {
-            console.log("o win!")
+        else if (players[1]) {
+            console.log(`${players[1]} wins!`);
         }
         else {
             console.log("NO winners!")
@@ -53,15 +58,15 @@ function Board() {
         return false;
     }
 
-    return { mark, printBoard, checkWinner };
+    return { getBoard, mark, printBoard, checkWinner };
 
 }
 
 
 function Cell() {
-    
+
     //Private
-    let state = 0;
+    let state = '_';
 
     //Public:
     const setState = (player) => {
@@ -74,31 +79,83 @@ function Cell() {
 };
 
 
-function Game() {
+function GameController() {
+
     const board = Board();
-    let players = ['x', 'o'];
+    let players = ['X', 'O'];
     let activePlayer = players[0];
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
 
-    const getActivePlayer = () => {
-        activePlayer;
-    }
+    const getActivePlayer = () => activePlayer;
 
-    const playRound = () => {
-        board.mark(activePlayer, 5)
-        board.mark(activePlayer, 4)
-        board.mark(activePlayer, 3)
+    const playRound = (loc) => {
+        console.log(
+            `Dropping ${getActivePlayer()}'s token into cell ${loc}...`
+        );
+
+        board.mark(activePlayer, loc)
+        console.log(board.printBoard())
+        board.checkWinner(players)
         switchPlayerTurn()
-        board.printBoard()
-        board.checkWinner()
     }
 
-    playRound()
+
+
+    return {
+        playRound,
+        getActivePlayer,
+        getBoard: board.getBoard
+    };
 
 
 }
 
-Game()
+function ScreenController() {
+
+    const game = GameController()
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+
+    const updateScreen = () => {
+
+        // clear the board
+        boardDiv.textContent = "";
+
+        // get the newest version of the board and player turn
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        // Display player's turn
+        playerTurnDiv.textContent = `${activePlayer}'s turn...`
+
+        board.forEach((cell, index) => {
+
+            const cellButton = document.createElement("button");
+            cellButton.classList.add("cell");
+            cellButton.dataset.column = index;
+            cellButton.textContent = cell.getState()
+            boardDiv.appendChild(cellButton);
+
+        });
+
+
+    };
+
+    function clickHandlerBoard(e) {
+
+        const selectedCell = e.target.dataset.column;
+        // Make sure I've clicked a column and not the gaps in between
+        if (!selectedCell) return;
+
+        game.playRound(selectedCell);
+        updateScreen();
+    }
+
+    boardDiv.addEventListener("click", clickHandlerBoard);
+    updateScreen()
+}
+
+ScreenController()
